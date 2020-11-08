@@ -7,7 +7,7 @@ export default async (req, res, next) => {
 
   const { admin } = user.rows[0];
 
-  if (admin === true) {
+  if (admin === false) {
     return res.status(401).json({ error: 'Permission denied.❗' });
   }
   return next();
