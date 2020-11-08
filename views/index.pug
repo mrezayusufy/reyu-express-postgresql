@@ -1,0 +1,23 @@
+html
+  head
+    title= title
+  body
+    h1= message
+    input(type="text", placeholder="input")
+    p #{name}'s Pug source code!
+    input(data-json=`
+      {
+        "very-long": "piece of ",
+        "data": true
+      }
+    `)
+    //- Declaration
+  mixin article(title='Default Title')
+    .article
+      .article-wrapper
+        h1= title
+
+  //- Use
+  +article()
+
+  +article('Hello world')

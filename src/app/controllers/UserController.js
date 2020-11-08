@@ -6,6 +6,7 @@ class UserController {
     const schema = Yup.object().shape({
       user_name: Yup.string().required(),
       user_firstname: Yup.string().required(),
+      user_lastname: Yup.string().required(),
       user_gender: Yup.string().required(),
       email: Yup.string()
         .email()
@@ -27,9 +28,10 @@ class UserController {
     const {
       user_gender,
       user_name,
+      user_lastname,
+      user_firstname,
       email,
       password,
-      user_firstname,
     } = req.body;
 
     const userExists = await User.getUserByEmail(email);
@@ -43,9 +45,10 @@ class UserController {
     const { rows } = await User.create(
       user_name,
       user_gender,
+      user_lastname,
+      user_firstname,
       email,
-      user_password,
-      user_firstname
+      user_password
     );
 
     const { id, admin } = rows[0];
@@ -61,8 +64,9 @@ class UserController {
 
   async update(req, res) {
     const schema = Yup.object().shape({
-      name: Yup.string(),
+      user_name: Yup.string(),
       user_firstname: Yup.string(),
+      user_lastname: Yup.string(),
       admin: Yup.boolean(),
       email: Yup.string().email(),
       oldPassword: Yup.string(),
@@ -103,19 +107,92 @@ class UserController {
 
     const userUpdated = await User.update(req.userId, req.body);
 
-    const { id, name, email, admin } = userUpdated.rows[0];
+    const {
+      id,
+      user_firstname,
+      user_name,
+      user_lastname,
+      email,
+      admin,
+    } = userUpdated.rows[0];
 
     return res.json({
       id,
-      name,
+      user_firstname,
+      user_name,
+      user_lastname,
       email,
       admin,
     });
   }
 
+  async emailVerified(req, res) {
+    const schema = Yup.object().shape({
+      user_email_verified: Yup.boolean(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation failed' });
+    }
+
+    const userUpdated = await User.update(req.userId, req.body);
+
+    const {
+      id,
+      user_firstname,
+      user_name,
+      user_lastname,
+      user_email_verified,
+      email,
+      admin,
+    } = userUpdated.rows[0];
+
+    return res.json({
+      id,
+      user_firstname,
+      user_name,
+      user_email_verified,
+      user_lastname,
+      email,
+      admin,
+    });
+  }
+
+  async adminVerified(req, res) {
+    const schema = Yup.object().shape({
+      admin: Yup.boolean(),
+    });
+
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation failed' });
+    }
+
+    const userUpdated = await User.update(req.userId, req.body);
+
+    const {
+      id,
+      user_firstname,
+      user_name,
+      user_lastname,
+      user_email_verified,
+      email,
+      admin,
+    } = userUpdated.rows[0];
+
+    return res.json({
+      id,
+      user_firstname,
+      user_name,
+      user_email_verified,
+      user_lastname,
+      email,
+      admin,
+    });
+  }
+
+  // index
   async index(req, res) {
     const { rows } = await User.getUsers();
-
     return res.json(rows);
   }
 }

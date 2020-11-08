@@ -49,11 +49,51 @@ class User {
   }
 
   async update(id, json) {
-    const { user_name, email, password, avatar_id } = json;
-
+    const {
+      user_name,
+      user_firstname,
+      user_lastname,
+      email,
+      password,
+      avatar_id,
+      user_email_verified,
+      admin,
+      user_biography,
+      user_website,
+      user_country,
+    } = json;
+    const query = {
+      text: `update users set 
+        user_country='${user_country}',
+        user_website='${user_website}',
+        user_biography='${user_biography}',
+        user_lastname='${user_lastname}'
+        where id=${id}`,
+    };
+    if (query) {
+      await db.query(query.text);
+    }
+    if (user_email_verified) {
+      await db.query(
+        `update users set user_email_verified='${user_email_verified}' where id=${id}`
+      );
+    }
+    if (admin) {
+      await db.query(`update users set admin='${admin}' where id=${id}`);
+    }
+    if (user_firstname) {
+      await db.query(
+        `update users set user_firstname='${user_firstname}' where id=${id}`
+      );
+    }
     if (user_name) {
       await db.query(
         `update users set user_name='${user_name}' where id=${id}`
+      );
+    }
+    if (user_lastname) {
+      await db.query(
+        `update users set user_lastname='${user_lastname}' where id=${id}`
       );
     }
 
@@ -63,7 +103,6 @@ class User {
 
     if (password) {
       const user_password = await this.hashPassword(password);
-
       await db.query(
         `update users set user_password='${user_password}' where id=${id}`
       );
